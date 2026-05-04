@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ModSteamV2</title>
+<title>ModSteam</title>
 
 <style>
 body {
@@ -18,7 +18,6 @@ body {
   font-size: 18px;
 }
 
-/* NOVO - CATEGORIAS */
 .categorias {
   display: flex;
   overflow-x: auto;
@@ -59,6 +58,12 @@ body {
   padding: 10px;
 }
 
+.titulo {
+  padding: 0 10px;
+  font-size: 13px;
+  color: #aaa;
+}
+
 .card {
   min-width: 140px;
   background: #1f1f1f;
@@ -86,6 +91,7 @@ body {
   color: #aaa;
 }
 
+/* 🔥 LOADER */
 .loader {
   border: 3px solid #333;
   border-top: 3px solid #00c853;
@@ -145,15 +151,6 @@ body {
   border-radius: 15px;
 }
 
-.modal-title {
-  font-size: 18px;
-}
-
-.modal-meta {
-  font-size: 13px;
-  color: #aaa;
-}
-
 .download-btn {
   background: #00c853;
   border: none;
@@ -178,9 +175,8 @@ body {
 </head>
 <body>
 
-<div class="header">ModSteamV2</div>
+<div class="header">ModSteam</div>
 
-<!-- CATEGORIAS -->
 <div class="categorias" id="categorias">
   <div class="cat-btn active" data-cat="Todos">Todos</div>
   <div class="cat-btn" data-cat="Roupas">Roupas</div>
@@ -194,7 +190,7 @@ body {
   <input type="text" id="busca" placeholder="Pesquisar mods...">
 </div>
 
-<div class="row" id="lista"></div>
+<div id="lista"></div>
 
 <div id="modal">
   <div id="modalContent"></div>
@@ -242,13 +238,50 @@ function render() {
   const termo = busca.value.toLowerCase();
   lista.innerHTML = "";
 
-  todosMods
-    .filter(m => {
-      const matchNome = (m.nome || "").toLowerCase().includes(termo);
-      const matchCat = categoriaAtual === "Todos" || m.categoria === categoriaAtual;
-      return matchNome && matchCat;
-    })
-    .forEach((m,i) => lista.appendChild(criarCard(m,i)));
+  const filtrados = todosMods.filter(m => {
+    const matchNome = (m.nome || "").toLowerCase().includes(termo);
+    const matchCat = categoriaAtual === "Todos" || m.categoria === categoriaAtual;
+    return matchNome && matchCat;
+  });
+
+  const top = [...filtrados].sort((a,b)=>(b.downloads||0)-(a.downloads||0)).slice(0,5);
+  const resto = filtrados.filter(m => !top.includes(m));
+
+  if (top.length) {
+    const titulo = document.createElement("div");
+    titulo.className = "titulo";
+    titulo.innerText = "🔥 Mais baixados";
+    lista.appendChild(titulo);
+
+    const rowTop = document.createElement("div");
+    rowTop.className = "row";
+
+    top.forEach(m => {
+      const indexReal = todosMods.indexOf(m);
+      rowTop.appendChild(criarCard(m, indexReal));
+    });
+
+    lista.appendChild(rowTop);
+  }
+
+  if (resto.length) {
+    const titulo = document.createElement("div");
+    titulo.className = "titulo";
+    titulo.innerText = "📦 Todos";
+    lista.appendChild(titulo);
+  }
+
+  for (let i = 0; i < resto.length; i += 4) {
+    const row = document.createElement("div");
+    row.className = "row";
+
+    resto.slice(i, i + 4).forEach(m => {
+      const indexReal = todosMods.indexOf(m);
+      row.appendChild(criarCard(m, indexReal));
+    });
+
+    lista.appendChild(row);
+  }
 }
 
 function criarCard(data, index) {
@@ -263,11 +296,9 @@ function criarCard(data, index) {
 
     <div class="info">
       <div class="title">${data.nome}</div>
-
       <div class="meta">
         ${data.tamanho || "N/A"} • ${formatarData(data.data)} • ${data.downloads || 0} downloads
       </div>
-
       <div class="meta">
         ${data.versao || "Sem versão"} • ${data.categoria || "Sem categoria"}
       </div>
@@ -285,14 +316,8 @@ function criarCard(data, index) {
           <img src="${data.iconURL}">
           <div>
             <div class="modal-title">${data.nome}</div>
-
             <div class="modal-meta">
               ${data.tamanho || "N/A"} • ${formatarData(data.data)} • ${data.downloads || 0} downloads
-            </div>
-
-            <div class="modal-meta">
-              Versão: ${data.versao || "N/A"}<br>
-              Categoria: ${data.categoria || "N/A"}
             </div>
           </div>
         </div>
@@ -343,7 +368,6 @@ onValue(ref(db, "mods"), snap => {
     todosMods.push(val);
   });
 
-  todosMods.sort((a,b)=>(b.data||0)-(a.data||0));
   render();
 });
 </script>
