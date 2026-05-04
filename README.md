@@ -1,183 +1,352 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arena Car Park - Jogo de Arena e Combate entre Carros</title>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #1d1d1d;
-            color: #fff;
-            margin: 0;
-            padding: 0;
-        }
-        /* Header */
-        .header {
-            text-align: center;
-            padding: 80px 20px;
-            background-color: #222;
-            color: #fff;
-            border-bottom: 6px solid #ff6600;
-        }
-        .header h1 {
-            font-size: 60px;
-            margin: 0;
-            letter-spacing: 1px;
-        }
-        .header p {
-            font-size: 20px;
-            color: #ddd;
-        }
-        /* Description */
-        .description {
-            padding: 40px 20px;
-            text-align: center;
-            background-color: #2e2e2e;
-        }
-        .description p {
-            font-size: 18px;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-        /* Download Buttons */
-        .download-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            margin-top: 40px;
-            flex-wrap: wrap;
-        }
-        .download-buttons a {
-            text-decoration: none;
-            padding: 20px 40px;
-            font-size: 18px;
-            color: #fff;
-            background-color: #ff6600;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        .download-buttons a:hover {
-            background-color: #ff4500;
-            transform: translateY(-5px);
-        }
-        .ios-unavailable {
-            background-color: #333;
-            padding: 20px;
-            margin-top: 30px;
-            color: #999;
-            font-size: 16px;
-            text-align: center;
-        }
-        /* Play Store Section */
-        .play-store {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 40px;
-            padding: 20px;
-            background-color: #2e2e2e;
-            border-radius: 10px;
-        }
-        .play-store img {
-            width: 100px;
-            height: auto;
-        }
-        .play-store p {
-            font-size: 18px;
-            color: #ccc;
-            margin: 0;
-        }
-        /* Game Videos */
-        .game-videos {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 50px;
-            padding: 30px;
-            flex-wrap: wrap;
-        }
-        .game-videos iframe {
-            width: 560px;
-            height: 315px;
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s ease;
-        }
-        .game-videos iframe:hover {
-            transform: scale(1.05);
-        }
-        /* Footer */
-        .footer {
-            text-align: center;
-            padding: 40px 20px;
-            background-color: #111;
-            font-size: 16px;
-            color: #aaa;
-        }
-        .footer a {
-            color: #ff6600;
-            text-decoration: none;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ModSteam</title>
 
-        /* Responsiveness */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 48px;
-            }
-            .description p {
-                font-size: 16px;
-            }
-            .download-buttons a {
-                padding: 15px 30px;
-                font-size: 16px;
-            }
-            .game-videos iframe {
-                width: 100%;
-                height: auto;
-            }
-        }
-    </style>
+<style>
+body {
+  margin: 0;
+  background: #121212;
+  color: white;
+  font-family: Arial;
+}
+
+.header {
+  padding: 10px 15px;
+  font-size: 18px;
+}
+
+/* NOVO - CATEGORIAS */
+.categorias {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 10px;
+}
+
+.cat-btn {
+  padding: 8px 14px;
+  background: #1f1f1f;
+  border-radius: 20px;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cat-btn.active {
+  background: #00c853;
+  color: black;
+}
+
+.search {
+  padding: 10px;
+}
+.search input {
+  width: 100%;
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  background: #1f1f1f;
+  color: white;
+}
+
+.row {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 10px;
+}
+
+.card {
+  min-width: 140px;
+  background: #1f1f1f;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+}
+
+.card .info {
+  padding: 8px;
+}
+
+.card .title {
+  font-size: 13px;
+}
+
+.card .meta {
+  font-size: 11px;
+  color: #aaa;
+}
+
+.loader {
+  border: 3px solid #333;
+  border-top: 3px solid #00c853;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  animation: spin 1s linear infinite;
+  position: absolute;
+  top: 45%;
+  left: 45%;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#modal {
+  display: none;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background: #121212;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+}
+
+.close-btn {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #1f1f1f;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.modal-box {
+  padding: 15px;
+}
+
+.modal-header {
+  display: flex;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.modal-header img {
+  width: 70px;
+  height: 70px;
+  border-radius: 15px;
+}
+
+.modal-title {
+  font-size: 18px;
+}
+
+.modal-meta {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.download-btn {
+  background: #00c853;
+  border: none;
+  padding: 14px;
+  width: 100%;
+  border-radius: 25px;
+  margin-top: 15px;
+}
+
+.gallery {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-top: 15px;
+}
+
+.gallery img {
+  height: 140px;
+  border-radius: 10px;
+}
+</style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Arena Car Park</h1>
-        <p>Prepare-se para combates emocionantes entre carros em uma arena intensa!</p>
+<div class="header">ModSteam</div>
+
+<!-- CATEGORIAS -->
+<div class="categorias" id="categorias">
+  <div class="cat-btn active" data-cat="Todos">Todos</div>
+  <div class="cat-btn" data-cat="Roupas">Roupas</div>
+  <div class="cat-btn" data-cat="Armas">Armas</div>
+  <div class="cat-btn" data-cat="Veiculos">Veiculos</div>
+  <div class="cat-btn" data-cat="Construções">Construções</div>
+  <div class="cat-btn" data-cat="Variados">Variados</div>
+</div>
+
+<div class="search">
+  <input type="text" id="busca" placeholder="Pesquisar mods...">
+</div>
+
+<div class="row" id="lista"></div>
+
+<div id="modal">
+  <div id="modalContent"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB5A-ySceXCFRQ7iSCnOA68nRJqYpK6DQc",
+  authDomain: "dayzozmbi-server.firebaseapp.com",
+  databaseURL: "https://dayzozmbi-server-default-rtdb.firebaseio.com",
+  projectId: "dayzozmbi-server",
+  storageBucket: "dayzozmbi-server.firebasestorage.app"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const lista = document.getElementById("lista");
+const busca = document.getElementById("busca");
+const categorias = document.querySelectorAll(".cat-btn");
+
+let todosMods = [];
+let categoriaAtual = "Todos";
+
+function formatarData(t) {
+  return t ? new Date(t).toLocaleDateString("pt-BR") : "Sem data";
+}
+
+function registrarDownload(index) {
+  const mod = todosMods[index];
+  const newCount = (mod.downloads || 0) + 1;
+
+  update(ref(db, "mods/" + mod._key), {
+    downloads: newCount
+  });
+
+  window.location.href = mod.zipURL;
+}
+window.registrarDownload = registrarDownload;
+
+function render() {
+  const termo = busca.value.toLowerCase();
+  lista.innerHTML = "";
+
+  todosMods
+    .filter(m => {
+      const matchNome = (m.nome || "").toLowerCase().includes(termo);
+      const matchCat = categoriaAtual === "Todos" || m.categoria === categoriaAtual;
+      return matchNome && matchCat;
+    })
+    .forEach((m,i) => lista.appendChild(criarCard(m,i)));
+}
+
+function criarCard(data, index) {
+  const div = document.createElement("div");
+  div.className = "card";
+
+  div.innerHTML = `
+    <div style="position:relative;">
+      <div class="loader"></div>
+      <img src="${data.iconURL}" onload="this.previousElementSibling.style.display='none'">
     </div>
 
-    <div class="description">
-        <p>Arena Car Park é um jogo multiplayer de combate entre carros, onde você pode competir com jogadores de todo o mundo. Explore diferentes arenas, personalize seu carro e vença seus adversários para se tornar o campeão da arena!</p>
-    </div>
+    <div class="info">
+      <div class="title">${data.nome}</div>
 
-    <div class="download-buttons">
-        <a href="https://download2283.mediafire.com/j3znok7kvo7g7VQYUkK3csFi0sMqq5N7m_AyEJzOynu0AlhQUSaq5pM3KCi6nlpvWKTv1JHaXIiT1_wjW1915Gh_k7Jn5E8yEEbkB3jSxq7Kymg1WV7bP2u6sJ-gZhw8tjWs5Y86oYOOQRbZqT-MRPogMUA-joqh2KSBhrU9EpUHx4-N/0os0tragbosgb9o/Arena+Car+Park+Update+V4.apk" target="_blank">Baixar para Android</a>
-        <a href="link-do-download-pc" target="_blank">Baixar para PC</a>
-    </div>
+      <div class="meta">
+        ${data.tamanho || "N/A"} • ${formatarData(data.data)} • ${data.downloads || 0} downloads
+      </div>
 
-    <div class="ios-unavailable">
-        <p>Versão para iOS ainda não disponível.</p>
+      <div class="meta">
+        ${data.versao || "Sem versão"} • ${data.categoria || "Sem categoria"}
+      </div>
     </div>
+  `;
 
-    <div class="play-store">
-        <img src="https://firebasestorage.googleapis.com/v0/b/teste-275ea.appspot.com/o/pngegg.png?alt=media&token=34935932-9e00-40e9-bb44-8bba31192a04" alt="Ícone Play Store">
-        <p>Em breve na Play Store!</p>
-    </div>
+  div.onclick = () => {
+    document.getElementById("modal").style.display = "block";
 
-    <div class="game-videos">
-        <iframe src="https://www.youtube.com/embed/ULRp34ciUaE" title="Vídeo do Jogo 1" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        <iframe src="https://www.youtube.com/embed/-rZWC8Igpa0" title="Vídeo do Jogo 2" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </div>
+    document.getElementById("modalContent").innerHTML = `
+      <div class="close-btn" onclick="fechar()">✖</div>
 
-    <div class="footer">
-        <p>&copy; 2025 Arena Car Park | <a href="https://www.instagram.com/adesireal_oficial?igsh=MXNra3Ixc2Vsa2oxZw==" target="_blank">Siga-nos no Instagram</a></p>
-    </div>
+      <div class="modal-box">
+        <div class="modal-header">
+          <img src="${data.iconURL}">
+          <div>
+            <div class="modal-title">${data.nome}</div>
+
+            <div class="modal-meta">
+              ${data.tamanho || "N/A"} • ${formatarData(data.data)} • ${data.downloads || 0} downloads
+            </div>
+
+            <div class="modal-meta">
+              Versão: ${data.versao || "N/A"}<br>
+              Categoria: ${data.categoria || "N/A"}
+            </div>
+          </div>
+        </div>
+
+        <button class="download-btn" onclick="registrarDownload(${index})">
+          ⬇ Baixar
+        </button>
+
+        <p>${data.descricao}</p>
+
+        <div class="gallery">
+          ${(data.imagens || []).map(img => `
+            <div style="position:relative;">
+              <div class="loader"></div>
+              <img src="${img}" onload="this.previousElementSibling.style.display='none'">
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  };
+
+  return div;
+}
+
+function fechar() {
+  document.getElementById("modal").style.display = "none";
+}
+window.fechar = fechar;
+
+categorias.forEach(btn => {
+  btn.onclick = () => {
+    document.querySelector(".active").classList.remove("active");
+    btn.classList.add("active");
+    categoriaAtual = btn.dataset.cat;
+    render();
+  };
+});
+
+busca.addEventListener("input", render);
+
+onValue(ref(db, "mods"), snap => {
+  todosMods = [];
+
+  snap.forEach(i => {
+    const val = i.val();
+    val._key = i.key;
+    todosMods.push(val);
+  });
+
+  todosMods.sort((a,b)=>(b.data||0)-(a.data||0));
+  render();
+});
+</script>
 
 </body>
 </html>
