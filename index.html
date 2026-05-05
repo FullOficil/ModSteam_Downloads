@@ -6,7 +6,6 @@
 <title>ModSteam Pro</title>
 
 <style>
-/* TODO SEU CSS ORIGINAL — NÃO ALTEREI NADA */
 body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 
 .header {
@@ -69,6 +68,7 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 }
 
 .search { padding: 10px; }
+
 .search input {
   width: 100%;
   padding: 12px;
@@ -78,14 +78,45 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   color: white;
 }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 10px; }
-.horizontal { display: flex; overflow-x: auto; gap: 12px; padding: 10px; }
-.horizontal .card { min-width: 140px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+  padding: 10px;
+}
 
-.card { background: #151515; border-radius: 12px; overflow: hidden; cursor: pointer; height: 210px; }
+.horizontal {
+  display: flex;
+  overflow-x: auto;
+  gap: 12px;
+  padding: 10px;
+}
 
-.card-img { position: relative; width: 100%; height: 140px; background: #222; }
-.card-img img { width: 100%; height: 100%; object-fit: cover; display: none; }
+.horizontal .card {
+  min-width: 140px;
+}
+
+.card {
+  background: #151515;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  height: 210px;
+}
+
+.card-img {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  background: #222;
+}
+
+.card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: none;
+}
 
 .loader {
   position: absolute;
@@ -103,7 +134,9 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-.card-info { padding: 8px; }
+.card-info {
+  padding: 8px;
+}
 
 .card-title {
   font-size: 13px;
@@ -125,46 +158,19 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   color: #aaa;
 }
 
-.modal {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: #000;
-  overflow-y: auto;
-  z-index: 999;
-  padding: 15px;
-}
-
-.close {
-  position: fixed;
-  top: 10px;
-  right: 10px;
-  background: #1f1f1f;
-  padding: 10px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.gallery {
-  display: flex;
-  gap: 10px;
-  overflow-x: auto;
-  margin-top: 15px;
-}
-
-.gallery-item {
-  position: relative;
-  min-width: 180px;
-  height: 120px;
-  background: #222;
+/* 🆕 BADGE NOVO */
+.new-badge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  background: #00c853;
+  color: black;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 4px 8px;
   border-radius: 12px;
-}
-
-.gallery-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: none;
+  z-index: 5;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
 }
 </style>
 </head>
@@ -192,11 +198,6 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 
 <div id="sections"></div>
 
-<div class="modal" id="modal">
-  <div class="close" onclick="fechar()">✖</div>
-  <div id="content"></div>
-</div>
-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -204,6 +205,7 @@ import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10
 const app = initializeApp({
   databaseURL: "https://dayzozmbi-server-default-rtdb.firebaseio.com"
 });
+
 const db = getDatabase(app);
 
 let mods = [];
@@ -251,8 +253,13 @@ function section(title,data,isHorizontal){
     const div = document.createElement("div");
     div.className = "card";
 
+    const agora = Date.now();
+    const umDia = 24 * 60 * 60 * 1000;
+    const isNovo = m.data && (agora - m.data) <= umDia;
+
     div.innerHTML = `
       <div class="card-img">
+        ${isNovo ? `<div class="new-badge">NOVO</div>` : ""}
         <div class="loader"></div>
         <img src="${m.iconURL}">
       </div>
@@ -272,7 +279,6 @@ function section(title,data,isHorizontal){
       img.style.display="block";
     };
 
-    // 🔥 ÚNICA ALTERAÇÃO
     div.onclick = ()=>{
       window.location.href = "PaginaVisual.html?id=" + m.id;
     };
