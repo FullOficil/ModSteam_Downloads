@@ -34,18 +34,10 @@ button {
   background: #00c853;
   font-weight: bold;
 }
-
-.back {
-  margin-bottom: 10px;
-  cursor: pointer;
-  color: #00c853;
-}
 </style>
 </head>
 
 <body>
-
-<div class="back" onclick="history.back()">← Voltar</div>
 
 <div class="box" id="content">Carregando...</div>
 
@@ -58,38 +50,31 @@ const app = initializeApp({
 });
 const db = getDatabase(app);
 
-// PEGAR ID
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
 if(!id){
   document.getElementById("content").innerHTML = "Mod não encontrado.";
-  throw new Error("Sem ID");
 }
 
-// BUSCAR NO FIREBASE
-const snap = await get(ref(db, "mods/" + id));
+const snap = await get(ref(db,"mods/"+id));
 
 if(!snap.exists()){
   document.getElementById("content").innerHTML = "Mod não encontrado.";
-  throw new Error("Não existe");
 }
 
-const mod = snap.val();
+const m = snap.val();
 
-// RENDER
 document.getElementById("content").innerHTML = `
-  <img src="${mod.iconURL}">
-  <h2>${mod.nome}</h2>
-  <p>${mod.descricao || ""}</p>
-
+  <img src="${m.iconURL}">
+  <h2>${m.nome}</h2>
+  <p>${m.descricao||""}</p>
   <button onclick="baixar()">⬇ Baixar</button>
 `;
 
-// DOWNLOAD
 window.baixar = ()=>{
   const a = document.createElement("a");
-  a.href = mod.zipURL;
+  a.href = m.zipURL;
   a.click();
 };
 </script>
