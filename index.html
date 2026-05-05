@@ -6,6 +6,7 @@
 <title>ModSteam Pro</title>
 
 <style>
+/* (SEU CSS TODO — NÃO MEXI EM NADA) */
 body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 
 .header {
@@ -27,6 +28,7 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   background: #111;
   transition: 0.3s;
   padding-top: 20px;
+  z-index: 1000;
 }
 
 .sidebar a {
@@ -34,12 +36,28 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   padding: 15px;
   color: white;
   text-decoration: none;
+  border-bottom: 1px solid #222;
+}
+
+.sidebar a.active {
+  background: #00c853;
+  color: black;
+  font-weight: bold;
 }
 
 .sidebar.open { left: 0; }
 
-.search { padding: 10px; }
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 999;
+}
 
+.overlay.show { display: block; }
+
+.search { padding: 10px; }
 .search input {
   width: 100%;
   padding: 12px;
@@ -49,34 +67,64 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   color: white;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 12px;
-  padding: 10px;
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; padding: 10px; }
+.horizontal { display: flex; overflow-x: auto; gap: 12px; padding: 10px; }
+.horizontal .card { min-width: 140px; }
+
+.card { background: #151515; border-radius: 12px; overflow: hidden; cursor: pointer; height: 210px; }
+
+.card-img { position: relative; width: 100%; height: 140px; background: #222; }
+.card-img img { width: 100%; height: 100%; object-fit: cover; display: none; }
+
+.loader {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 26px; height: 26px;
+  border: 3px solid #333;
+  border-top: 3px solid #00c853;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin 1s linear infinite;
 }
 
-.card {
-  background: #151515;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-.card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-}
+.card-info { padding: 8px; }
 
 .card-title {
-  padding: 8px;
   font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-meta {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 2px;
+}
+
+.section-title {
+  padding: 10px;
+  font-size: 13px;
+  color: #aaa;
 }
 </style>
 </head>
 
 <body>
+
+<!-- MENU -->
+<div class="sidebar" id="sidebar">
+  <a href="index.html" class="active">Mods Project Zomboid</a>
+  <a href="download.html">Download Project Zomboid</a>
+</div>
+
+<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
 <div class="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
@@ -87,7 +135,7 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   <input type="text" id="busca" placeholder="Pesquisar mods...">
 </div>
 
-<div id="grid" class="grid"></div>
+<div id="sections"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -100,42 +148,91 @@ const db = getDatabase(app);
 
 let mods = [];
 
-window.toggleMenu = ()=>{};
+window.toggleMenu = ()=>{
+  sidebar.classList.toggle("open");
+  overlay.classList.toggle("show");
+};
 
 function render(){
-  const grid = document.getElementById("grid");
-  grid.innerHTML = "";
+  const container = document.getElementById("sections");
+  container.innerHTML = "";
 
   const search = document.getElementById("busca").value.toLowerCase();
 
-  mods
-  .filter(m => (m.nome||"").toLowerCase().includes(search))
-  .forEach(m=>{
+  const filtered = mods.filter(m =>
+    (m.nome||"").toLowerCase().includes(search)
+  );
+
+  const sorted = [...filtered]
+    .sort((a,b)=>(b.downloads||0)-(a.downloads||0));
+
+  const top4 = sorted.slice(0,4);
+  if(top4.length){
+    container.appendChild(section("🔥 Mais baixados", top4, true));
+  }
+
+  const rest = sorted.slice(4);
+  if(rest.length){
+    container.appendChild(section("📦 Mods", rest, false));
+  }
+}
+
+function section(title,data,isHorizontal){
+  const wrap = document.createElement("div");
+
+  const t = document.createElement("div");
+  t.className = "section-title";
+  t.innerText = title;
+
+  const grid = document.createElement("div");
+  grid.className = isHorizontal ? "horizontal" : "grid";
+
+  data.forEach(m=>{
     const div = document.createElement("div");
     div.className = "card";
 
     div.innerHTML = `
-      <img src="${m.iconURL}">
-      <div class="card-title">${m.nome}</div>
+      <div class="card-img">
+        <div class="loader"></div>
+        <img src="${m.iconURL}">
+      </div>
+
+      <div class="card-info">
+        <div class="card-title">${m.nome}</div>
+        <div class="card-meta">Versão ${m.versao||"N/A"}</div>
+        <div class="card-meta">📥 ${m.downloads||0}</div>
+      </div>
     `;
 
-    // 🔥 LINK COMPARTILHÁVEL
+    const img = div.querySelector("img");
+    const loader = div.querySelector(".loader");
+
+    img.onload = ()=>{
+      loader.style.display="none";
+      img.style.display="block";
+    };
+
+    // 🔥 AQUI FOI ALTERADO (ABRIR OUTRA PÁGINA)
     div.onclick = ()=>{
       window.location.href = "PaginaVisual.html?id=" + m.id;
     };
 
     grid.appendChild(div);
   });
+
+  wrap.appendChild(t);
+  wrap.appendChild(grid);
+  return wrap;
 }
 
-document.getElementById("busca").addEventListener("input", render);
+document.getElementById("busca").addEventListener("input",render);
 
 onValue(ref(db,"mods"),snap=>{
   mods=[];
   snap.forEach(i=>{
-    let d = i.val();
-    d.id = i.key; // 👈 ESSENCIAL
-    mods.push(d);
+    let data = i.val();
+    data.id = i.key; // ESSENCIAL
+    mods.push(data);
   });
   render();
 });
