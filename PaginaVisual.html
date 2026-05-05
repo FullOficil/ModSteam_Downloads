@@ -43,10 +43,7 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   border-bottom: 1px solid #222;
 }
 
-.sidebar a:hover {
-  background: #1f1f1f;
-}
-
+.sidebar a:hover { background: #1f1f1f; }
 .sidebar.open { left: 0; }
 
 .overlay {
@@ -60,9 +57,7 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 .overlay.show { display: block; }
 
 /* CONTEÚDO */
-.content {
-  padding: 15px;
-}
+.content { padding: 15px; }
 
 /* TOPO */
 .top {
@@ -122,9 +117,19 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   overflow-x: auto;
 }
 
-.gallery img {
+.gallery-item {
+  position: relative;
+  min-width: 180px;
   height: 140px;
   border-radius: 12px;
+  background: #222;
+  overflow: hidden;
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* DESCRIÇÃO */
@@ -133,6 +138,47 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   color: #aaa;
   font-size: 14px;
   line-height: 1.4;
+}
+
+/* 🔥 SKELETON */
+.skeleton {
+  background: linear-gradient(90deg,#1f1f1f 25%,#2a2a2a 37%,#1f1f1f 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* FADE IN */
+.fade-img {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.fade-img.loaded {
+  opacity: 1;
+}
+
+/* loader spinner */
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 26px;
+  height: 26px;
+  border: 3px solid #333;
+  border-top: 3px solid #00c853;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 </style>
 </head>
@@ -150,16 +196,12 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-<!-- HEADER -->
 <div class="header">
   <div class="menu-btn" onclick="toggleMenu()">☰</div>
   Visualizar Mod
 </div>
 
-<!-- CONTEÚDO -->
-<div class="content" id="content">
-  Carregando...
-</div>
+<div class="content" id="content">Carregando...</div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -171,13 +213,21 @@ const app = initializeApp({
 
 const db = getDatabase(app);
 
-// MENU
+/* MENU */
 window.toggleMenu = ()=>{
   document.getElementById("sidebar").classList.toggle("open");
   document.getElementById("overlay").classList.toggle("show");
 };
 
-// ID MOD
+/* IMAGE LOADER */
+function setupImage(img, loader) {
+  img.onload = () => {
+    loader.style.display = "none";
+    img.classList.add("loaded");
+  };
+}
+
+/* ID */
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
@@ -185,7 +235,7 @@ if(!id){
   document.getElementById("content").innerHTML = "Mod não encontrado.";
 }
 
-// BUSCAR MOD
+/* FETCH */
 const snap = await get(ref(db,"mods/"+id));
 
 if(!snap.exists()){
@@ -198,13 +248,12 @@ const dataFormatada = m.data
   ? new Date(m.data).toLocaleDateString("pt-BR")
   : "N/A";
 
-// RENDER
+/* RENDER */
 document.getElementById("content").innerHTML = `
   <div class="top">
     <img src="${m.iconURL}">
     <div class="top-info">
       <h2>${m.nome}</h2>
-
       <div class="meta">Versão ${m.versao || "N/A"}</div>
       <div class="meta">📥 ${m.downloads || 0} downloads</div>
       <div class="meta">📦 ${m.tamanhoMB || "?"} MB</div>
@@ -212,24 +261,22 @@ document.getElementById("content").innerHTML = `
     </div>
   </div>
 
-  <button class="download-btn" onclick="baixar()">
-    ⬇ Baixar
-  </button>
-
-  <button class="share-btn" onclick="compartilhar()">
-    🔗 Compartilhar
-  </button>
+  <button class="download-btn" onclick="baixar()">⬇ Baixar</button>
+  <button class="share-btn" onclick="compartilhar()">🔗 Compartilhar</button>
 
   <div class="gallery">
-    ${(m.imagens || []).map(i=>`<img src="${i}">`).join("")}
+    ${(m.imagens || []).map(i => `
+      <div class="gallery-item">
+        <div class="loader"></div>
+        <img class="fade-img" src="${i}">
+      </div>
+    `).join("")}
   </div>
 
-  <div class="desc">
-    ${m.descricao || ""}
-  </div>
+  <div class="desc">${m.descricao || ""}</div>
 `;
 
-// DOWNLOAD
+/* DOWNLOAD */
 window.baixar = ()=>{
   runTransaction(ref(db,"mods/"+id+"/downloads"), val=>{
     return (val||0)+1;
@@ -240,7 +287,7 @@ window.baixar = ()=>{
   a.click();
 };
 
-// SHARE
+/* SHARE */
 window.compartilhar = () => {
   const url = window.location.href;
 
@@ -255,6 +302,16 @@ window.compartilhar = () => {
     window.open(wpp, "_blank");
   }
 };
+
+/* APPLY IMAGE EFFECTS */
+setTimeout(() => {
+  document.querySelectorAll(".gallery-item").forEach(el => {
+    const img = el.querySelector("img");
+    const loader = el.querySelector(".loader");
+    setupImage(img, loader);
+  });
+}, 300);
+
 </script>
 
 </body>
