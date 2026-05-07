@@ -6,7 +6,12 @@
 <title>Visualizar Mod</title>
 
 <style>
-body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0b0b0b;
+  color: white;
+}
 
 /* HEADER */
 .header {
@@ -43,8 +48,13 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   border-bottom: 1px solid #222;
 }
 
-.sidebar a:hover { background: #1f1f1f; }
-.sidebar.open { left: 0; }
+.sidebar a:hover {
+  background: #1f1f1f;
+}
+
+.sidebar.open {
+  left: 0;
+}
 
 .overlay {
   position: fixed;
@@ -54,10 +64,14 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   z-index: 999;
 }
 
-.overlay.show { display: block; }
+.overlay.show {
+  display: block;
+}
 
 /* CONTEÚDO */
-.content { padding: 15px; }
+.content {
+  padding: 15px;
+}
 
 /* TOPO */
 .top {
@@ -82,6 +96,13 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   font-size: 12px;
   color: #aaa;
   margin-top: 3px;
+}
+
+/* ESTRELAS */
+.rating-view {
+  margin-top: 5px;
+  color: #ffd700;
+  font-size: 14px;
 }
 
 /* BOTÕES */
@@ -140,19 +161,84 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   line-height: 1.4;
 }
 
-/* 🔥 SKELETON */
-.skeleton {
-  background: linear-gradient(90deg,#1f1f1f 25%,#2a2a2a 37%,#1f1f1f 63%);
-  background-size: 400% 100%;
-  animation: shimmer 1.2s ease-in-out infinite;
+/* COMENTÁRIOS */
+.comment-box{
+  margin-top:25px;
+  background:#151515;
+  padding:15px;
+  border-radius:15px;
 }
 
-@keyframes shimmer {
-  0% { background-position: 100% 0; }
-  100% { background-position: -100% 0; }
+.comment-box h3{
+  margin-top:0;
 }
 
-/* FADE IN */
+.stars{
+  display:flex;
+  gap:5px;
+  margin-bottom:10px;
+}
+
+.star{
+  font-size:28px;
+  cursor:pointer;
+  color:#555;
+}
+
+.star.active{
+  color:#ffd700;
+}
+
+.comment-box textarea{
+  width:100%;
+  height:90px;
+  border:none;
+  border-radius:10px;
+  padding:10px;
+  background:#222;
+  color:white;
+  resize:none;
+  box-sizing:border-box;
+}
+
+.comment-btn{
+  margin-top:10px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#00c853;
+  color:black;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.comments{
+  margin-top:25px;
+}
+
+.comment{
+  background:#151515;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+.comment-top{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:8px;
+}
+
+.comment-user{
+  font-weight:bold;
+}
+
+.comment-stars{
+  color:#ffd700;
+}
+
+/* FADE */
 .fade-img {
   opacity: 0;
   transition: opacity 0.4s ease;
@@ -162,7 +248,7 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   opacity: 1;
 }
 
-/* loader spinner */
+/* loader */
 .loader {
   position: absolute;
   top: 50%;
@@ -177,8 +263,12 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 }
 
 @keyframes spin {
-  0% { transform: translate(-50%, -50%) rotate(0deg); }
-  100% { transform: translate(-50%, -50%) rotate(360deg); }
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 </style>
 </head>
@@ -201,116 +291,384 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
   Visualizar Mod
 </div>
 
-<div class="content" id="content">Carregando...</div>
+<div class="content" id="content">
+  Carregando...
+</div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getDatabase,
+  ref,
+  get,
+  runTransaction,
+  push
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const app = initializeApp({
-  databaseURL: "https://dayzozmbi-server-default-rtdb.firebaseio.com"
+  databaseURL:
+  "https://dayzozmbi-server-default-rtdb.firebaseio.com"
 });
 
 const db = getDatabase(app);
 
+/* LOGIN */
+const usuario =
+JSON.parse(localStorage.getItem("usuarioModSteam"));
+
 /* MENU */
 window.toggleMenu = ()=>{
-  document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("overlay").classList.toggle("show");
+
+  document.getElementById("sidebar")
+  .classList.toggle("open");
+
+  document.getElementById("overlay")
+  .classList.toggle("show");
+
 };
 
 /* IMAGE LOADER */
-function setupImage(img, loader) {
-  img.onload = () => {
+function setupImage(img, loader){
+
+  img.onload = ()=>{
+
     loader.style.display = "none";
+
     img.classList.add("loaded");
+
   };
+
 }
 
 /* ID */
-const params = new URLSearchParams(window.location.search);
+const params =
+new URLSearchParams(window.location.search);
+
 const id = params.get("id");
 
 if(!id){
-  document.getElementById("content").innerHTML = "Mod não encontrado.";
+
+  document.getElementById("content")
+  .innerHTML = "Mod não encontrado.";
+
 }
 
-/* FETCH */
-const snap = await get(ref(db,"mods/"+id));
+/* FETCH MOD */
+const snap =
+await get(ref(db,"mods/"+id));
 
 if(!snap.exists()){
-  document.getElementById("content").innerHTML = "Mod não encontrado.";
+
+  document.getElementById("content")
+  .innerHTML = "Mod não encontrado.";
+
 }
 
 const m = snap.val();
 
+/* FETCH COMMENTS */
+const commentsSnap =
+await get(ref(db,"comentarios/"+id));
+
+let comentarios = [];
+
+if(commentsSnap.exists()){
+
+  commentsSnap.forEach(c=>{
+
+    comentarios.push(c.val());
+
+  });
+
+}
+
+/* MÉDIA */
+let media = 0;
+
+if(comentarios.length){
+
+  let total = 0;
+
+  comentarios.forEach(c=>{
+
+    total += Number(c.estrelas || 0);
+
+  });
+
+  media = (total / comentarios.length).toFixed(1);
+
+}
+
 const dataFormatada = m.data
-  ? new Date(m.data).toLocaleDateString("pt-BR")
-  : "N/A";
+? new Date(m.data).toLocaleDateString("pt-BR")
+: "N/A";
 
 /* RENDER */
 document.getElementById("content").innerHTML = `
+
   <div class="top">
+
     <img src="${m.iconURL}">
+
     <div class="top-info">
+
       <h2>${m.nome}</h2>
-      <div class="meta">Versão ${m.versao || "N/A"}</div>
-      <div class="meta">📥 ${m.downloads || 0} downloads</div>
-      <div class="meta">📦 ${m.tamanhoMB || "?"} MB</div>
-      <div class="meta">📅 ${dataFormatada}</div>
+
+      <div class="meta">
+        Versão ${m.versao || "N/A"}
+      </div>
+
+      <div class="meta">
+        📥 ${m.downloads || 0} downloads
+      </div>
+
+      <div class="meta">
+        📦 ${m.tamanhoMB || "?"} MB
+      </div>
+
+      <div class="meta">
+        📅 ${dataFormatada}
+      </div>
+
+      <div class="rating-view">
+        ⭐ ${media} / 5 (${comentarios.length})
+      </div>
+
     </div>
+
   </div>
 
-  <button class="download-btn" onclick="baixar()">⬇ Baixar</button>
-  <button class="share-btn" onclick="compartilhar()">🔗 Compartilhar</button>
+  <button class="download-btn" onclick="baixar()">
+    ⬇ Baixar
+  </button>
+
+  <button class="share-btn" onclick="compartilhar()">
+    🔗 Compartilhar
+  </button>
 
   <div class="gallery">
+
     ${(m.imagens || []).map(i => `
+
       <div class="gallery-item">
+
         <div class="loader"></div>
+
         <img class="fade-img" src="${i}">
+
       </div>
+
     `).join("")}
+
   </div>
 
-  <div class="desc">${m.descricao || ""}</div>
+  <div class="desc">
+
+    ${m.descricao || ""}
+
+  </div>
+
+  <div class="comment-box">
+
+    <h3>⭐ Avaliar e comentar</h3>
+
+    <div class="stars">
+
+      <span class="star" data-v="1">★</span>
+      <span class="star" data-v="2">★</span>
+      <span class="star" data-v="3">★</span>
+      <span class="star" data-v="4">★</span>
+      <span class="star" data-v="5">★</span>
+
+    </div>
+
+    <textarea id="comentario"
+    placeholder="Digite seu comentário..."></textarea>
+
+    <button class="comment-btn"
+    onclick="enviarComentario()">
+
+      Enviar comentário
+
+    </button>
+
+  </div>
+
+  <div class="comments">
+
+    <h3>💬 Comentários</h3>
+
+    ${comentarios.reverse().map(c=>`
+
+      <div class="comment">
+
+        <div class="comment-top">
+
+          <div class="comment-user">
+            ${c.nick}
+          </div>
+
+          <div class="comment-stars">
+            ${"★".repeat(c.estrelas)}
+          </div>
+
+        </div>
+
+        <div>
+          ${c.texto}
+        </div>
+
+      </div>
+
+    `).join("")}
+
+  </div>
+
 `;
+
+/* STARS */
+let estrelasSelecionadas = 0;
+
+document.querySelectorAll(".star")
+.forEach(star=>{
+
+  star.onclick = ()=>{
+
+    estrelasSelecionadas =
+    Number(star.dataset.v);
+
+    document
+    .querySelectorAll(".star")
+    .forEach(s=>{
+
+      s.classList.remove("active");
+
+      if(Number(s.dataset.v)
+      <= estrelasSelecionadas){
+
+        s.classList.add("active");
+
+      }
+
+    });
+
+  };
+
+});
+
+/* ENVIAR COMENTÁRIO */
+window.enviarComentario = async ()=>{
+
+  if(!usuario){
+
+    return alert("Faça login!");
+
+  }
+
+  const texto =
+  document.getElementById("comentario")
+  .value
+  .trim();
+
+  if(!texto){
+
+    return alert("Digite um comentário!");
+
+  }
+
+  if(estrelasSelecionadas < 1){
+
+    return alert("Escolha estrelas!");
+
+  }
+
+  await push(
+    ref(db,"comentarios/"+id),
+    {
+      nick: usuario.nick,
+      texto,
+      estrelas: estrelasSelecionadas,
+      data: Date.now()
+    }
+  );
+
+  alert("Comentário enviado!");
+
+  location.reload();
+
+};
 
 /* DOWNLOAD */
 window.baixar = ()=>{
-  runTransaction(ref(db,"mods/"+id+"/downloads"), val=>{
-    return (val||0)+1;
-  });
 
-  const a = document.createElement("a");
+  runTransaction(
+    ref(db,"mods/"+id+"/downloads"),
+    val => {
+
+      return (val || 0) + 1;
+
+    }
+  );
+
+  const a =
+  document.createElement("a");
+
   a.href = m.zipURL;
+
   a.click();
+
 };
 
 /* SHARE */
-window.compartilhar = () => {
+window.compartilhar = ()=>{
+
   const url = window.location.href;
 
-  if (navigator.share) {
+  if(navigator.share){
+
     navigator.share({
       title: m.nome,
       text: "Veja esse mod!",
       url: url
     });
-  } else {
-    const wpp = "https://wa.me/?text=" + encodeURIComponent(m.nome + " " + url);
-    window.open(wpp, "_blank");
+
+  }else{
+
+    const wpp =
+    "https://wa.me/?text="
+    +
+    encodeURIComponent(
+      m.nome + " " + url
+    );
+
+    window.open(wpp,"_blank");
+
   }
+
 };
 
-/* APPLY IMAGE EFFECTS */
-setTimeout(() => {
-  document.querySelectorAll(".gallery-item").forEach(el => {
-    const img = el.querySelector("img");
-    const loader = el.querySelector(".loader");
+/* APPLY IMAGES */
+setTimeout(()=>{
+
+  document
+  .querySelectorAll(".gallery-item")
+  .forEach(el=>{
+
+    const img =
+    el.querySelector("img");
+
+    const loader =
+    el.querySelector(".loader");
+
     setupImage(img, loader);
+
   });
-}, 300);
+
+},300);
 
 </script>
 
