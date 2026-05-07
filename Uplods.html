@@ -59,10 +59,14 @@ button{
   font-weight:bold;
 }
 
-.btn-main{ background:#00c853; }
-.btn-sec{ background:#2196f3; }
+.btn-main{
+  background:#00c853;
+}
 
-/* LISTA */
+.btn-sec{
+  background:#2196f3;
+}
+
 .list{
   margin-top:10px;
 }
@@ -78,7 +82,6 @@ button{
   align-items:center;
 }
 
-/* BOTÃO LIXEIRA */
 .del-btn{
   background:#ff3b3b;
   border:none;
@@ -98,7 +101,6 @@ button{
   background:#ff1f1f;
 }
 
-/* INFO USER */
 .user-box{
   background:#151515;
   border:1px solid #2a2a2a;
@@ -127,37 +129,53 @@ button{
 
 <!-- INFO -->
 <div class="card">
+
   <h3>Informações</h3>
 
   <input id="nome" placeholder="Nome do Mod">
+
   <textarea id="descricao" placeholder="Descrição"></textarea>
 
   <input id="versao" placeholder="Versão">
 
   <select id="categoria">
+
     <option value="">Categoria</option>
+
     <option>Roupas</option>
+
     <option>Armas</option>
+
     <option>Veiculos</option>
+
     <option>Construções</option>
+
     <option>Variados</option>
+
   </select>
+
 </div>
 
 <!-- ARQUIVOS -->
 <div class="card">
+
   <h3>Arquivos</h3>
 
   <input type="file" id="zip" accept=".zip">
+
   <input type="file" id="icone" accept="image/*">
+
   <input type="file" id="imagens" multiple accept="image/*">
+
 </div>
 
 <!-- DEPENDÊNCIAS -->
 <div class="card">
+
   <h3>🔗 Dependências</h3>
 
   <input id="depNome" placeholder="Nome dependência">
+
   <input id="depLink" placeholder="Link">
 
   <button class="btn-sec" onclick="addDep()">
@@ -165,10 +183,12 @@ button{
   </button>
 
   <div class="list" id="deps"></div>
+
 </div>
 
-<!-- VÍDEOS -->
+<!-- VIDEOS -->
 <div class="card">
+
   <h3>🎥 Vídeos YouTube</h3>
 
   <input id="videoLink" placeholder="Link do vídeo">
@@ -178,13 +198,16 @@ button{
   </button>
 
   <div class="list" id="videos"></div>
+
 </div>
 
 <!-- ENVIAR -->
 <div class="card">
+
   <button class="btn-main" id="uploadBtn">
     🚀 Enviar Mod
   </button>
+
 </div>
 
 </div>
@@ -225,6 +248,7 @@ const firebaseConfig = {
 
   appId:
   "1:221905253103:android:fc1bc06782cf5735c4611a"
+
 };
 
 const app = initializeApp(firebaseConfig);
@@ -238,7 +262,7 @@ let dependencias = [];
 let videos = [];
 
 /* =========================
-   USUÁRIO LOGADO
+   USUÁRIO
 ========================= */
 
 const usuario =
@@ -255,12 +279,11 @@ if(!usuario || !usuario.nick){
 document.getElementById("nickLogado")
 .innerText = usuario.nick;
 
-
 /* =========================
    DEPENDÊNCIAS
 ========================= */
 
-window.addDep = () => {
+window.addDep = ()=>{
 
   const nome =
   document.getElementById("depNome").value;
@@ -282,7 +305,6 @@ window.addDep = () => {
   renderDeps();
 
   document.getElementById("depNome").value = "";
-
   document.getElementById("depLink").value = "";
 
 };
@@ -294,7 +316,7 @@ function renderDeps(){
 
   el.innerHTML = "";
 
-  dependencias.forEach((d, i) => {
+  dependencias.forEach((d,i)=>{
 
     const div =
     document.createElement("div");
@@ -310,7 +332,7 @@ function renderDeps(){
     `;
 
     div.querySelector(".del-btn")
-    .onclick = () => {
+    .onclick = ()=>{
 
       dependencias.splice(i,1);
 
@@ -324,12 +346,11 @@ function renderDeps(){
 
 }
 
-
 /* =========================
-   VÍDEOS
+   VIDEOS
 ========================= */
 
-window.addVideo = () => {
+window.addVideo = ()=>{
 
   const link =
   document.getElementById("videoLink").value;
@@ -355,7 +376,7 @@ function renderVideos(){
 
   el.innerHTML = "";
 
-  videos.forEach((v, i) => {
+  videos.forEach((v,i)=>{
 
     const div =
     document.createElement("div");
@@ -371,7 +392,7 @@ function renderVideos(){
     `;
 
     div.querySelector(".del-btn")
-    .onclick = () => {
+    .onclick = ()=>{
 
       videos.splice(i,1);
 
@@ -385,13 +406,12 @@ function renderVideos(){
 
 }
 
-
 /* =========================
    UPLOAD
 ========================= */
 
 document.getElementById("uploadBtn")
-.addEventListener("click", async () => {
+.addEventListener("click", async ()=>{
 
   const nome =
   document.getElementById("nome").value;
@@ -429,13 +449,14 @@ document.getElementById("uploadBtn")
 
   if(imagens.length < 1 || imagens.length > 5){
 
-    return alert("1 a 5 imagens!");
+    return alert("Envie de 1 a 5 imagens!");
 
   }
 
   try{
 
-    const base = "mods/" + Date.now();
+    const base =
+    "mods/" + Date.now();
 
     const nomeSeguro = nome
 
@@ -449,45 +470,58 @@ document.getElementById("uploadBtn")
 
       .replace(/\s+/g,"_");
 
+    /* TAMANHO DO MOD */
+    const tamanhoMB =
+    (zip.size / 1024 / 1024).toFixed(1);
+
     /* ZIP */
     const zipRef =
     ref(storage,
     `${base}/${nomeSeguro}.zip`);
 
-    await uploadBytesResumable(zipRef, zip);
+    await uploadBytesResumable(
+      zipRef,
+      zip
+    );
 
     const zipURL =
     await getDownloadURL(zipRef);
 
     /* ÍCONE */
     const iconRef =
-    ref(storage, base+"/icon.png");
+    ref(storage,
+    base+"/icon.png");
 
-    await uploadBytesResumable(iconRef, icone);
+    await uploadBytesResumable(
+      iconRef,
+      icone
+    );
 
     const iconURL =
     await getDownloadURL(iconRef);
 
     /* IMAGENS */
-    let imgs=[];
+    let imgs = [];
 
     for(let i=0;i<imagens.length;i++){
 
       const imgRef =
-      ref(storage, `${base}/img_${i}`);
+      ref(storage,
+      `${base}/img_${i}`);
 
       await uploadBytesResumable(
         imgRef,
         imagens[i]
       );
 
-      imgs.push(
-        await getDownloadURL(imgRef)
-      );
+      const url =
+      await getDownloadURL(imgRef);
+
+      imgs.push(url);
 
     }
 
-    /* SALVAR MOD */
+    /* SALVAR FIREBASE */
     await push(dbRef(db,"mods"),{
 
       nome,
@@ -507,7 +541,8 @@ document.getElementById("uploadBtn")
 
       downloads: 0,
 
-      /* NOVO */
+      tamanhoMB,
+
       autorNick: usuario.nick
 
     });
