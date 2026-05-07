@@ -41,6 +41,7 @@ input, textarea, select{
   background:#2a2a2a;
   color:white;
   outline:none;
+  box-sizing:border-box;
 }
 
 textarea{
@@ -96,6 +97,20 @@ button{
 .del-btn:hover{
   background:#ff1f1f;
 }
+
+/* INFO USER */
+.user-box{
+  background:#151515;
+  border:1px solid #2a2a2a;
+  padding:12px;
+  border-radius:12px;
+  margin-bottom:15px;
+}
+
+.user-box span{
+  color:#00c853;
+  font-weight:bold;
+}
 </style>
 </head>
 
@@ -104,6 +119,11 @@ button{
 <div class="container">
 
 <h1>📦 Upload de Mods Pro</h1>
+
+<div class="user-box">
+  Logado como:
+  <span id="nickLogado">Carregando...</span>
+</div>
 
 <!-- INFO -->
 <div class="card">
@@ -140,7 +160,9 @@ button{
   <input id="depNome" placeholder="Nome dependência">
   <input id="depLink" placeholder="Link">
 
-  <button class="btn-sec" onclick="addDep()">Adicionar dependência</button>
+  <button class="btn-sec" onclick="addDep()">
+    Adicionar dependência
+  </button>
 
   <div class="list" id="deps"></div>
 </div>
@@ -151,137 +173,264 @@ button{
 
   <input id="videoLink" placeholder="Link do vídeo">
 
-  <button class="btn-sec" onclick="addVideo()">Adicionar vídeo</button>
+  <button class="btn-sec" onclick="addVideo()">
+    Adicionar vídeo
+  </button>
 
   <div class="list" id="videos"></div>
 </div>
 
 <!-- ENVIAR -->
 <div class="card">
-  <button class="btn-main" id="uploadBtn">🚀 Enviar Mod</button>
+  <button class="btn-main" id="uploadBtn">
+    🚀 Enviar Mod
+  </button>
 </div>
 
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { getDatabase, ref as dbRef, push } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+import {
+  getDatabase,
+  ref as dbRef,
+  push
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_AUTH_DOMAIN",
-  databaseURL: "https://dayzozmbi-server-default-rtdb.firebaseio.com",
+
+  apiKey: "AIzaSyB5A-ySceXCFRQ7iSCnOA68nRJqYpK6DQc",
+
+  databaseURL:
+  "https://dayzozmbi-server-default-rtdb.firebaseio.com",
+
   projectId: "dayzozmbi-server",
-  storageBucket: "dayzozmbi-server.firebasestorage.app",
+
+  storageBucket:
+  "dayzozmbi-server.firebasestorage.app",
+
   messagingSenderId: "221905253103",
-  appId: "SEU_APP_ID"
+
+  appId:
+  "1:221905253103:android:fc1bc06782cf5735c4611a"
 };
 
 const app = initializeApp(firebaseConfig);
+
 const storage = getStorage(app);
+
 const db = getDatabase(app);
 
 let dependencias = [];
+
 let videos = [];
 
+/* =========================
+   USUÁRIO LOGADO
+========================= */
 
-// =======================
-// DEPENDÊNCIAS
-// =======================
+const usuario =
+JSON.parse(localStorage.getItem("usuarioModSteam"));
+
+if(!usuario || !usuario.nick){
+
+  alert("Faça login primeiro!");
+
+  window.location.href = "Login.html";
+
+}
+
+document.getElementById("nickLogado")
+.innerText = usuario.nick;
+
+
+/* =========================
+   DEPENDÊNCIAS
+========================= */
+
 window.addDep = () => {
-  const nome = document.getElementById("depNome").value;
-  const link = document.getElementById("depLink").value;
 
-  if(!nome || !link) return alert("Preencha tudo!");
+  const nome =
+  document.getElementById("depNome").value;
 
-  dependencias.push({ nome, link });
+  const link =
+  document.getElementById("depLink").value;
+
+  if(!nome || !link){
+
+    return alert("Preencha tudo!");
+
+  }
+
+  dependencias.push({
+    nome,
+    link
+  });
+
   renderDeps();
 
   document.getElementById("depNome").value = "";
+
   document.getElementById("depLink").value = "";
+
 };
 
 function renderDeps(){
-  const el = document.getElementById("deps");
+
+  const el =
+  document.getElementById("deps");
+
   el.innerHTML = "";
 
   dependencias.forEach((d, i) => {
-    const div = document.createElement("div");
+
+    const div =
+    document.createElement("div");
+
     div.className = "item";
 
     div.innerHTML = `
       <span>🔗 ${d.nome}</span>
-      <button class="del-btn">🗑️</button>
+
+      <button class="del-btn">
+        🗑️
+      </button>
     `;
 
-    div.querySelector(".del-btn").onclick = () => {
-      dependencias.splice(i, 1);
+    div.querySelector(".del-btn")
+    .onclick = () => {
+
+      dependencias.splice(i,1);
+
       renderDeps();
+
     };
 
     el.appendChild(div);
+
   });
+
 }
 
 
-// =======================
-// VÍDEOS
-// =======================
-window.addVideo = () => {
-  const link = document.getElementById("videoLink").value;
+/* =========================
+   VÍDEOS
+========================= */
 
-  if(!link) return alert("Link inválido!");
+window.addVideo = () => {
+
+  const link =
+  document.getElementById("videoLink").value;
+
+  if(!link){
+
+    return alert("Link inválido!");
+
+  }
 
   videos.push(link);
+
   renderVideos();
 
   document.getElementById("videoLink").value = "";
+
 };
 
 function renderVideos(){
-  const el = document.getElementById("videos");
+
+  const el =
+  document.getElementById("videos");
+
   el.innerHTML = "";
 
   videos.forEach((v, i) => {
-    const div = document.createElement("div");
+
+    const div =
+    document.createElement("div");
+
     div.className = "item";
 
     div.innerHTML = `
       <span>🎥 ${v}</span>
-      <button class="del-btn">🗑️</button>
+
+      <button class="del-btn">
+        🗑️
+      </button>
     `;
 
-    div.querySelector(".del-btn").onclick = () => {
-      videos.splice(i, 1);
+    div.querySelector(".del-btn")
+    .onclick = () => {
+
+      videos.splice(i,1);
+
       renderVideos();
+
     };
 
     el.appendChild(div);
+
   });
+
 }
 
 
-// =======================
-// UPLOAD
-// =======================
-document.getElementById("uploadBtn").addEventListener("click", async () => {
+/* =========================
+   UPLOAD
+========================= */
 
-  const nome = document.getElementById("nome").value;
-  const descricao = document.getElementById("descricao").value;
-  const versao = document.getElementById("versao").value;
-  const categoria = document.getElementById("categoria").value;
+document.getElementById("uploadBtn")
+.addEventListener("click", async () => {
 
-  const zip = document.getElementById("zip").files[0];
-  const icone = document.getElementById("icone").files[0];
-  const imagens = document.getElementById("imagens").files;
+  const nome =
+  document.getElementById("nome").value;
 
-  if(!nome || !descricao || !zip || !icone || !categoria || !versao){
+  const descricao =
+  document.getElementById("descricao").value;
+
+  const versao =
+  document.getElementById("versao").value;
+
+  const categoria =
+  document.getElementById("categoria").value;
+
+  const zip =
+  document.getElementById("zip").files[0];
+
+  const icone =
+  document.getElementById("icone").files[0];
+
+  const imagens =
+  document.getElementById("imagens").files;
+
+  if(
+    !nome ||
+    !descricao ||
+    !zip ||
+    !icone ||
+    !categoria ||
+    !versao
+  ){
+
     return alert("Preencha tudo!");
+
   }
 
   if(imagens.length < 1 || imagens.length > 5){
+
     return alert("1 a 5 imagens!");
+
   }
 
   try{
@@ -289,47 +438,93 @@ document.getElementById("uploadBtn").addEventListener("click", async () => {
     const base = "mods/" + Date.now();
 
     const nomeSeguro = nome
+
       .normalize("NFD")
+
       .replace(/[\u0300-\u036f]/g,"")
+
       .replace(/[^a-zA-Z0-9 ]/g,"")
+
       .trim()
+
       .replace(/\s+/g,"_");
 
-    const zipRef = ref(storage, `${base}/${nomeSeguro}.zip`);
+    /* ZIP */
+    const zipRef =
+    ref(storage,
+    `${base}/${nomeSeguro}.zip`);
+
     await uploadBytesResumable(zipRef, zip);
-    const zipURL = await getDownloadURL(zipRef);
 
-    const iconRef = ref(storage, base+"/icon.png");
+    const zipURL =
+    await getDownloadURL(zipRef);
+
+    /* ÍCONE */
+    const iconRef =
+    ref(storage, base+"/icon.png");
+
     await uploadBytesResumable(iconRef, icone);
-    const iconURL = await getDownloadURL(iconRef);
 
+    const iconURL =
+    await getDownloadURL(iconRef);
+
+    /* IMAGENS */
     let imgs=[];
+
     for(let i=0;i<imagens.length;i++){
-      const imgRef = ref(storage, `${base}/img_${i}`);
-      await uploadBytesResumable(imgRef, imagens[i]);
-      imgs.push(await getDownloadURL(imgRef));
+
+      const imgRef =
+      ref(storage, `${base}/img_${i}`);
+
+      await uploadBytesResumable(
+        imgRef,
+        imagens[i]
+      );
+
+      imgs.push(
+        await getDownloadURL(imgRef)
+      );
+
     }
 
+    /* SALVAR MOD */
     await push(dbRef(db,"mods"),{
+
       nome,
       descricao,
       versao,
       categoria,
+
       zipURL,
       iconURL,
+
       imagens: imgs,
+
       dependencias,
       videos,
+
       data: Date.now(),
-      downloads: 0
+
+      downloads: 0,
+
+      /* NOVO */
+      autorNick: usuario.nick
+
     });
 
     alert("Upload concluído!");
 
+    window.location.href =
+    "MinhasPublicacoes.html";
+
   }catch(e){
+
     alert(e.message);
+
   }
+
 });
+
 </script>
 
 </body>
