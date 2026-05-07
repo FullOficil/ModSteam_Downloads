@@ -130,8 +130,7 @@ import {
   getDatabase,
   ref,
   onValue,
-  update,
-  get
+  update
 }
 from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -191,30 +190,35 @@ document.getElementById("empty");
 window.aprovar =
 async (nick,id)=>{
 
-  /* SALVAR NO LOCAL */
-  if(usuario.nick === nick){
+  try{
 
-    usuario.autorizadoUpload = true;
-
-    localStorage.setItem(
-      "usuarioModSteam",
-      JSON.stringify(usuario)
+    /* AUTORIZAR USUÁRIO */
+    await update(
+      ref(db,"usuariosAutorizados"),
+      {
+        [nick]: true
+      }
     );
 
+    /* ALTERAR STATUS */
+    await update(
+      ref(db,
+      "solicitacoesUpload/"+id),
+      {
+        status:"aprovado"
+      }
+    );
+
+    alert(
+      nick +
+      " aprovado com sucesso!"
+    );
+
+  }catch(e){
+
+    alert(e.message);
+
   }
-
-  await update(
-    ref(db,
-    "solicitacoesUpload/"+id),
-    {
-      status:"aprovado"
-    }
-  );
-
-  alert(
-    nick +
-    " aprovado!"
-  );
 
 };
 
@@ -222,15 +226,25 @@ async (nick,id)=>{
 window.recusar =
 async (id)=>{
 
-  await update(
-    ref(db,
-    "solicitacoesUpload/"+id),
-    {
-      status:"recusado"
-    }
-  );
+  try{
 
-  alert("Solicitação recusada.");
+    await update(
+      ref(db,
+      "solicitacoesUpload/"+id),
+      {
+        status:"recusado"
+      }
+    );
+
+    alert(
+      "Solicitação recusada."
+    );
+
+  }catch(e){
+
+    alert(e.message);
+
+  }
 
 };
 
