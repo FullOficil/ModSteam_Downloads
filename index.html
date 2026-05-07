@@ -159,7 +159,7 @@ body {
   border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  height: 210px;
+  height: 235px;
 }
 
 .card-img {
@@ -214,7 +214,7 @@ body {
 .card-meta {
   font-size: 11px;
   color: #aaa;
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .section-title {
@@ -253,7 +253,6 @@ body {
     Download Project Zomboid
   </a>
 
-  <!-- MINHAS PUBLICAÇÕES -->
   <a href="MinhasPublicacoes.html"
   id="minhasPubBtn"
   style="display:none;">
@@ -262,7 +261,6 @@ body {
 
   </a>
 
-  <!-- PAINEL ADM -->
   <a href="PainelAdm.html"
   id="painelAdmBtn"
   style="display:none;">
@@ -307,7 +305,6 @@ onclick="toggleMenu()"></div>
 
   <div class="header-right">
 
-    <!-- NOTIFICAÇÃO -->
     <div class="notify-btn">
 
       🔔
@@ -316,7 +313,6 @@ onclick="toggleMenu()"></div>
 
     </div>
 
-    <!-- LOGIN -->
     <button class="login-btn"
     id="loginBtn">
 
@@ -390,7 +386,6 @@ if(usuario && usuario.nick){
   minhasPubBtn.style.display =
   "block";
 
-  /* ADM */
   if(usuario.nick === "ADM"){
 
     painelAdmBtn.style.display =
@@ -567,11 +562,15 @@ function section(title,data,isHorizontal){
         </div>
 
         <div class="card-meta">
-          Versão ${m.versao || "N/A"}
+          🔧 Build ${m.versao || "N/A"}
         </div>
 
         <div class="card-meta">
-          📥 ${m.downloads || 0}
+          ⭐ ${m.avaliacao || 0}/5
+        </div>
+
+        <div class="card-meta">
+          📥 ${m.downloads || 0} Downloads
         </div>
 
       </div>
