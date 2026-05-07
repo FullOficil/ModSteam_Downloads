@@ -200,11 +200,32 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 <body>
 
 <div class="sidebar" id="sidebar">
-  <a href="index.html" class="active">Mods Project Zomboid</a>
-  <a href="download.html">Download Project Zomboid</a>
-  <a href="#">Servidores BR</a>
-  <a href="#">Servidores USA</a>
-  <a href="#">Discord</a>
+
+  <a href="index.html" class="active">
+    Mods Project Zomboid
+  </a>
+
+  <a href="download.html">
+    Download Project Zomboid
+  </a>
+
+  <!-- NOVA FUNÇÃO -->
+  <a href="MinhasPublicacoes.html" id="minhasPubBtn" style="display:none;">
+    📦 Minha Publicações
+  </a>
+
+  <a href="#">
+    Servidores BR
+  </a>
+
+  <a href="#">
+    Servidores USA
+  </a>
+
+  <a href="#">
+    Discord
+  </a>
+
 </div>
 
 <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
@@ -229,8 +250,14 @@ body { margin: 0; font-family: Arial; background: #0b0b0b; color: white; }
 <div id="sections"></div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import {
+  getDatabase,
+  ref,
+  onValue
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const app = initializeApp({
   databaseURL: "https://dayzozmbi-server-default-rtdb.firebaseio.com"
@@ -243,69 +270,143 @@ let mods = [];
 /* LOGIN */
 const loginBtn = document.getElementById("loginBtn");
 
-const usuario = JSON.parse(localStorage.getItem("usuarioModSteam"));
+const usuario =
+  JSON.parse(localStorage.getItem("usuarioModSteam"));
 
+/* BOTÃO MINHAS PUBLICAÇÕES */
+const minhasPubBtn =
+  document.getElementById("minhasPubBtn");
+
+/* SE ESTIVER LOGADO */
 if(usuario && usuario.nick){
+
   loginBtn.innerText = usuario.nick;
+
+  minhasPubBtn.style.display = "block";
+
 }else{
+
   loginBtn.innerText = "Login";
+
+  minhasPubBtn.style.display = "none";
+
 }
 
 loginBtn.onclick = ()=>{
+
   window.location.href = "Login.html";
+
 };
 
 window.toggleMenu = ()=>{
-  document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("overlay").classList.toggle("show");
+
+  document.getElementById("sidebar")
+    .classList.toggle("open");
+
+  document.getElementById("overlay")
+    .classList.toggle("show");
+
 };
 
 function render(){
-  const container = document.getElementById("sections");
+
+  const container =
+    document.getElementById("sections");
+
   container.innerHTML = "";
 
-  const search = document.getElementById("busca").value.toLowerCase();
+  const search =
+    document.getElementById("busca")
+    .value
+    .toLowerCase();
 
   const filtered = mods.filter(m =>
-    (m.nome||"").toLowerCase().includes(search)
+
+    (m.nome||"")
+    .toLowerCase()
+    .includes(search)
+
   );
 
   const sorted = [...filtered]
-    .sort((a,b)=>(b.downloads||0)-(a.downloads||0));
+
+    .sort((a,b)=>
+
+      (b.downloads||0)
+      -
+      (a.downloads||0)
+
+    );
 
   const top4 = sorted.slice(0,4);
 
   if(top4.length){
-    container.appendChild(section("🔥 Mais baixados", top4, true));
+
+    container.appendChild(
+
+      section(
+        "🔥 Mais baixados",
+        top4,
+        true
+      )
+
+    );
+
   }
 
   const rest = sorted.slice(4);
 
   if(rest.length){
-    container.appendChild(section("📦 Mods", rest, false));
+
+    container.appendChild(
+
+      section(
+        "📦 Mods",
+        rest,
+        false
+      )
+
+    );
+
   }
+
 }
 
 function section(title,data,isHorizontal){
 
-  const wrap = document.createElement("div");
+  const wrap =
+    document.createElement("div");
 
-  const t = document.createElement("div");
+  const t =
+    document.createElement("div");
+
   t.className = "section-title";
+
   t.innerText = title;
 
-  const grid = document.createElement("div");
-  grid.className = isHorizontal ? "horizontal" : "grid";
+  const grid =
+    document.createElement("div");
+
+  grid.className =
+    isHorizontal
+    ? "horizontal"
+    : "grid";
 
   data.forEach(m=>{
 
-    const div = document.createElement("div");
+    const div =
+      document.createElement("div");
+
     div.className = "card";
 
     const agora = Date.now();
-    const umDia = 24 * 60 * 60 * 1000;
 
-    const isNovo = m.data && (agora - m.data) <= umDia;
+    const umDia =
+      24 * 60 * 60 * 1000;
+
+    const isNovo =
+      m.data &&
+      (agora - m.data) <= umDia;
 
     div.innerHTML = `
       <div class="card-img">
@@ -319,22 +420,41 @@ function section(title,data,isHorizontal){
       </div>
 
       <div class="card-info">
-        <div class="card-title">${m.nome}</div>
-        <div class="card-meta">Versão ${m.versao||"N/A"}</div>
-        <div class="card-meta">📥 ${m.downloads||0}</div>
+
+        <div class="card-title">
+          ${m.nome}
+        </div>
+
+        <div class="card-meta">
+          Versão ${m.versao||"N/A"}
+        </div>
+
+        <div class="card-meta">
+          📥 ${m.downloads||0}
+        </div>
+
       </div>
     `;
 
-    const img = div.querySelector("img");
-    const loader = div.querySelector(".loader");
+    const img =
+      div.querySelector("img");
+
+    const loader =
+      div.querySelector(".loader");
 
     img.onload = ()=>{
+
       loader.style.display="none";
+
       img.style.display="block";
+
     };
 
     div.onclick = ()=>{
-      window.location.href = "PaginaVisual.html?id=" + m.id;
+
+      window.location.href =
+        "PaginaVisual.html?id=" + m.id;
+
     };
 
     grid.appendChild(div);
@@ -342,12 +462,16 @@ function section(title,data,isHorizontal){
   });
 
   wrap.appendChild(t);
+
   wrap.appendChild(grid);
 
   return wrap;
+
 }
 
-document.getElementById("busca").addEventListener("input",render);
+document
+  .getElementById("busca")
+  .addEventListener("input",render);
 
 onValue(ref(db,"mods"),snap=>{
 
@@ -366,6 +490,7 @@ onValue(ref(db,"mods"),snap=>{
   render();
 
 });
+
 </script>
 
 </body>
