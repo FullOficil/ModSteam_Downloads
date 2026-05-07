@@ -10,8 +10,6 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   color: white;
-
-  /* fallback caso vídeo não carregue */
   background: url("Fundo.png") no-repeat center center fixed;
   background-size: cover;
 }
@@ -41,12 +39,63 @@ body {
   font-size: 18px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 10px;
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.header-right{
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
 .menu-btn {
   font-size: 22px;
   cursor: pointer;
+}
+
+/* NOTIFICAÇÃO */
+.notify-btn{
+  width:42px;
+  height:42px;
+  border-radius:50%;
+  background:#1f1f1f;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  font-size:18px;
+}
+
+.notify-dot{
+  position:absolute;
+  top:7px;
+  right:8px;
+  width:8px;
+  height:8px;
+  background:#00c853;
+  border-radius:50%;
+}
+
+/* LOGIN */
+.login-btn{
+  background:#00c853;
+  color:black;
+  border:none;
+  padding:10px 16px;
+  border-radius:20px;
+  font-weight:bold;
+  cursor:pointer;
+  max-width:140px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 
 /* SIDEBAR */
@@ -166,86 +215,281 @@ h2 {
 <body>
 
 <!-- VÍDEO -->
-<video id="bgVideo" class="bg-video" autoplay muted loop playsinline preload="auto">
-  <source src="VideoDeFundo.mp4" type="video/mp4">
+<video
+id="bgVideo"
+class="bg-video"
+autoplay
+muted
+loop
+playsinline
+preload="auto">
+
+  <source
+  src="VideoDeFundo.mp4"
+  type="video/mp4">
+
 </video>
 
 <div class="bg-overlay"></div>
 
 <!-- MENU -->
 <div class="sidebar" id="sidebar">
-  <a href="index.html">Mods Project Zomboid</a>
-  <a class="active">Download</a>
-  <a href="#">Servidores BR</a>
-  <a href="#">Servidores USA</a>
-  <a href="#">Discord</a>
+
+  <a href="index.html">
+    Mods Project Zomboid
+  </a>
+
+  <a href="download.html" class="active">
+    Download Project Zomboid
+  </a>
+
+  <!-- MINHAS PUBLICAÇÕES -->
+  <a href="MinhasPublicacoes.html"
+  id="minhasPubBtn"
+  style="display:none;">
+
+    📦 Minha Publicações
+
+  </a>
+
+  <!-- PAINEL ADM -->
+  <a href="PainelAdm.html"
+  id="painelAdmBtn"
+  style="display:none;">
+
+    🛠️ Painel ADM
+
+  </a>
+
+  <a href="#">
+    Servidores BR
+  </a>
+
+  <a href="#">
+    Servidores USA
+  </a>
+
+  <a href="#">
+    Discord
+  </a>
+
 </div>
 
-<div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+<div
+class="overlay"
+id="overlay"
+onclick="toggleMenu()"></div>
 
 <!-- HEADER -->
 <div class="header">
-  <div class="menu-btn" onclick="toggleMenu()">☰</div>
-  Download
+
+  <div class="header-left">
+
+    <div
+    class="menu-btn"
+    onclick="toggleMenu()">
+
+      ☰
+
+    </div>
+
+    Download
+
+  </div>
+
+  <div class="header-right">
+
+    <!-- NOTIFICAÇÃO -->
+    <div class="notify-btn">
+
+      🔔
+
+      <div class="notify-dot"></div>
+
+    </div>
+
+    <!-- LOGIN -->
+    <button
+    class="login-btn"
+    id="loginBtn">
+
+      Login
+
+    </button>
+
+  </div>
+
 </div>
 
 <!-- CONTEÚDO -->
 <div class="content">
+
   <div class="box">
 
-    <h2>Download Project Zomboid</h2>
+    <h2>
+      Download Project Zomboid
+    </h2>
 
     <p class="subtitle">
       Project Zomboid 100% adaptado para Android
     </p>
 
     <p class="highlight">
-      <strong>(Com Suporte A multiplayer No Mobile)</strong>
+      <strong>
+        (Com suporte a multiplayer no Mobile)
+      </strong>
     </p>
 
     <div class="info">
-      <p><strong>Versão:</strong> Build 41</p>
-      <p><strong>Formato:</strong> Arquivo .ZIP</p>
+
+      <p>
+        <strong>Versão:</strong>
+        Build 41
+      </p>
+
+      <p>
+        <strong>Formato:</strong>
+        Arquivo .ZIP
+      </p>
+
     </div>
 
     <div class="description">
+
       <h3>Descrição</h3>
-      <p>O arquivo contém tudo para rodar no Android.</p>
+
+      <p>
+        O arquivo contém tudo para rodar no Android.
+      </p>
+
       <ul>
+
         <li>APK do jogo</li>
+
         <li>Arquivos adicionais</li>
+
         <li>Build 41 completa</li>
+
       </ul>
+
     </div>
 
-    <a class="download-btn"
-       href="https://www.mediafire.com/file/fqtx0fidmlaori2/Project+zomboid+mobile.zip/file"
-       target="_blank">
-       ⬇ Baixar Agora
+    <a
+    class="download-btn"
+    href="https://www.mediafire.com/file/fqtx0fidmlaori2/Project+zomboid+mobile.zip/file"
+    target="_blank">
+
+      ⬇ Baixar Agora
+
     </a>
 
   </div>
+
 </div>
 
 <script>
-function toggleMenu(){
-  document.getElementById("sidebar").classList.toggle("open");
-  document.getElementById("overlay").classList.toggle("show");
+
+/* LOGIN */
+const loginBtn =
+document.getElementById("loginBtn");
+
+const usuario =
+JSON.parse(
+localStorage.getItem("usuarioModSteam")
+);
+
+/* BOTÕES */
+const minhasPubBtn =
+document.getElementById("minhasPubBtn");
+
+const painelAdmBtn =
+document.getElementById("painelAdmBtn");
+
+/* STATUS LOGIN */
+if(usuario && usuario.nick){
+
+  loginBtn.innerText =
+  usuario.nick;
+
+  minhasPubBtn.style.display =
+  "block";
+
+  /* ADM */
+  if(usuario.nick === "ADM"){
+
+    painelAdmBtn.style.display =
+    "block";
+
+  }else{
+
+    painelAdmBtn.style.display =
+    "none";
+
+  }
+
+}else{
+
+  loginBtn.innerText =
+  "Login";
+
+  minhasPubBtn.style.display =
+  "none";
+
+  painelAdmBtn.style.display =
+  "none";
+
 }
 
-/* INICIAR EM 0:20 */
-const video = document.getElementById("bgVideo");
+/* LOGIN CLICK */
+loginBtn.onclick = ()=>{
 
-video.addEventListener("loadedmetadata", () => {
+  location.href =
+  "Login.html";
+
+};
+
+/* MENU */
+function toggleMenu(){
+
+  document
+  .getElementById("sidebar")
+  .classList.toggle("open");
+
+  document
+  .getElementById("overlay")
+  .classList.toggle("show");
+
+}
+
+/* VÍDEO */
+const video =
+document.getElementById("bgVideo");
+
+/* COMEÇAR EM 0:20 */
+video.addEventListener(
+"loadedmetadata",
+()=>{
+
   video.currentTime = 20;
+
 });
 
-/* LOOP A PARTIR DE 0:20 */
-video.addEventListener("timeupdate", () => {
-  if (video.currentTime >= video.duration - 0.3) {
+/* LOOP */
+video.addEventListener(
+"timeupdate",
+()=>{
+
+  if(
+    video.currentTime >=
+    video.duration - 0.3
+  ){
+
     video.currentTime = 20;
+
   }
+
 });
+
 </script>
 
 </body>
